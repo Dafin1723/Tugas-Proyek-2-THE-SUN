@@ -13,11 +13,11 @@
 
 ## 👥 Tim Pengembang
 
-| Nama　　　 | Role |
-| ------------| ------|
-| 👨‍💻 Dafin |      |
-| 👨‍💻 Iben　|      |
-| 👨‍💻 Fahad |      |
+| Nama　　　  | Role |
+| ----------- | ------|
+| 👨‍💻 Dafin   |      |
+| 👨‍💻 Iben　  |      |
+| 👨‍💻 Fahad   |      |
 
 Kami adalah **Kelompok THE SUN** ☀️  
 Tim yang berkomitmen untuk menghadirkan inovasi digital dalam membantu UMKM meningkatkan kualitas layanan pelanggan.
