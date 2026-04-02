@@ -26,9 +26,9 @@ Tim yang berkomitmen untuk menghadirkan inovasi digital dalam membantu UMKM meni
 
 ## 📌 Deskripsi Project
 
-**Otomasi Bot Layanan Pelanggan UMKM** adalah sistem chatbot otomatis yang dirancang untuk membantu pelaku UMKM dalam memberikan respon cepat, efisien, dan profesional kepada pelanggan.
+** Otomasi Bot Layanan Pelanggan UMKM** adalah sistem chatbot otomatis yang dirancang untuk membantu pelaku UMKM dalam memberikan respon cepat, efisien, dan profesional kepada pelanggan.
 
-Bot ini mampu menjawab pertanyaan umum secara otomatis tanpa perlu admin membalas satu per satu.
+Bot ini mampu menjawab pertanyaan umum secara otomatis tanpa perlu admin membalas satu per satu.**
 
 ---
 
