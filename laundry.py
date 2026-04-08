@@ -24,8 +24,8 @@ from telegram.ext import (
 # CONFIG
 # ==============================
 
-TOKEN = "ISI_TOKEN_LO"
-ADMIN_ID = 8028474070
+TOKEN = "8785123843:AAFjsLRtyaQcjCWZvBP3hBKZBHsKra-Ze_M"
+ADMIN_ID = 6880142498
 
 logging.basicConfig(level=logging.INFO)
 
@@ -63,19 +63,29 @@ def generate_kode():
     return f"LDR-{random.randint(10000,99999)}"
 
 # ==============================
+# KEYBOARD
+# ==============================
+
+def user_menu():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🧺 Order Laundry", callback_data="order")],
+        [InlineKeyboardButton("📦 Cek Status", callback_data="cek")]
+    ])
+
+def admin_keyboard():
+    return ReplyKeyboardMarkup([
+        ["📊 Lihat Order"],
+        ["🏠 Menu"]
+    ], resize_keyboard=True)
+
+# ==============================
 # START
 # ==============================
 
 def start(update: Update, context: CallbackContext):
-
-    keyboard = [
-        [InlineKeyboardButton("🧺 Order Laundry", callback_data="order")],
-        [InlineKeyboardButton("📦 Cek Status", callback_data="cek")]
-    ]
-
     update.message.reply_text(
         "Selamat datang di Bot Laundry",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=user_menu()
     )
 
 # ==============================
@@ -85,16 +95,12 @@ def start(update: Update, context: CallbackContext):
 def admin_command(update: Update, context: CallbackContext):
 
     if update.message.from_user.id != ADMIN_ID:
-        update.message.reply_text("❌ Kamu bukan admin")
+        update.message.reply_text("❌ Bukan admin")
         return
 
-    keyboard = [
-        [InlineKeyboardButton("📊 Lihat Order", callback_data="lihat")]
-    ]
-
     update.message.reply_text(
-        "👑 Menu Admin",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        "👑 ADMIN PANEL",
+        reply_markup=admin_keyboard()
     )
 
 # ==============================
@@ -125,10 +131,7 @@ def pilih_layanan(update: Update, context: CallbackContext):
     location_button = KeyboardButton("📍 Kirim Lokasi", request_location=True)
     keyboard = ReplyKeyboardMarkup([[location_button]], resize_keyboard=True)
 
-    query.message.reply_text(
-        "Kirim alamat atau lokasi:",
-        reply_markup=keyboard
-    )
+    query.message.reply_text("Kirim alamat atau lokasi:", reply_markup=keyboard)
 
 # ==============================
 # TERIMA LOKASI
@@ -189,42 +192,23 @@ def handle_text(update: Update, context: CallbackContext):
     text = update.message.text
     user = update.message.from_user
 
-    # INPUT ALAMAT MANUAL
-    if "layanan" in context.user_data:
+    # ==============================
+    # ADMIN MENU
+    # ==============================
 
-        layanan = context.user_data["layanan"]
-        kode = generate_kode()
-
-        cursor.execute("""
-        INSERT INTO orders(kode,user_id,nama,layanan,alamat,status,tanggal)
-        VALUES(?,?,?,?,?,?,?)
-        """, (
-            kode, user.id, user.first_name, layanan,
-            text, "🚚 Menunggu dijemput",
-            datetime.now().strftime("%d-%m-%Y")
-        ))
-
-        conn.commit()
-
-        update.message.reply_text(f"""
-✅ ORDER BERHASIL
-
-Kode: {kode}
-Alamat: {text}
-""")
-
-        context.bot.send_message(ADMIN_ID, f"""
-🔔 ORDER BARU
-
-Kode: {kode}
-Nama: {user.first_name}
-Alamat: {text}
-""")
-
-        context.user_data.clear()
+    if text == "📊 Lihat Order":
+        list_order(update, context)
         return
 
+    if text == "🏠 Menu":
+        context.user_data.clear()
+        update.message.reply_text("Kembali ke menu utama", reply_markup=user_menu())
+        return
+
+    # ==============================
     # INPUT BERAT (ADMIN)
+    # ==============================
+
     if "berat" in context.user_data:
 
         kode = context.user_data["kode"]
@@ -254,94 +238,108 @@ Berat: {berat} kg
 Total: Rp{int(harga)}
 """)
 
-        update.message.reply_text("✅ Berhasil ditimbang")
+        update.message.reply_text("✅ Berhasil ditimbang", reply_markup=admin_keyboard())
+        context.user_data.clear()
+        return
 
+    # ==============================
+    # INPUT ALAMAT USER
+    # ==============================
+
+    if "layanan" in context.user_data:
+
+        kode = generate_kode()
+
+        cursor.execute("""
+        INSERT INTO orders(kode,user_id,nama,layanan,alamat,status,tanggal)
+        VALUES(?,?,?,?,?,?,?)
+        """, (
+            kode, user.id, user.first_name,
+            context.user_data["layanan"],
+            text, "🚚 Menunggu dijemput",
+            datetime.now().strftime("%d-%m-%Y")
+        ))
+
+        conn.commit()
+
+        update.message.reply_text(f"✅ Order berhasil\nKode: {kode}")
         context.user_data.clear()
 
 # ==============================
-# ADMIN FLOW (BUTTON BASED)
+# ADMIN PRO SYSTEM
 # ==============================
 
-def lihat_order(update: Update, context: CallbackContext):
+def list_order(update: Update, context: CallbackContext):
 
-    query = update.callback_query
-    query.answer()
-
-    cursor.execute("SELECT kode,nama FROM orders ORDER BY id DESC LIMIT 10")
+    cursor.execute("SELECT kode,nama,status FROM orders ORDER BY id DESC LIMIT 10")
     data = cursor.fetchall()
 
     if not data:
-        query.message.reply_text("Belum ada order")
+        update.message.reply_text("Belum ada order")
         return
 
     keyboard = [
-        [InlineKeyboardButton(f"{d[0]} - {d[1]}", callback_data=f"detail_{d[0]}")]
+        [InlineKeyboardButton(f"{d[0]} - {d[1]} ({d[2]})", callback_data=f"pilih_{d[0]}")]
         for d in data
     ]
 
-    query.message.reply_text("📊 Pilih Order:", reply_markup=InlineKeyboardMarkup(keyboard))
+    update.message.reply_text(
+        "📊 Pilih Order:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 
-def detail_order(update: Update, context: CallbackContext):
+def pilih_order(update: Update, context: CallbackContext):
 
     query = update.callback_query
     query.answer()
 
     kode = query.data.split("_")[1]
-
-    cursor.execute("SELECT nama,layanan,status FROM orders WHERE kode=?", (kode,))
-    data = cursor.fetchone()
-
-    if not data:
-        query.message.reply_text("Data tidak ditemukan")
-        return
-
-    nama, layanan, status = data
+    context.user_data["kode"] = kode
 
     keyboard = [
-        [InlineKeyboardButton("⚖️ Timbang", callback_data=f"timbang_{kode}")],
-        [InlineKeyboardButton("🧼 Proses", callback_data=f"proses_{kode}")],
-        [InlineKeyboardButton("🚀 Antar", callback_data=f"antar_{kode}")],
-        [InlineKeyboardButton("✅ Selesai", callback_data=f"selesai_{kode}")]
+        [InlineKeyboardButton("⚖️ Timbang", callback_data="aksi_timbang")],
+        [InlineKeyboardButton("🧼 Proses", callback_data="aksi_proses")],
+        [InlineKeyboardButton("🚀 Antar", callback_data="aksi_antar")],
+        [InlineKeyboardButton("✅ Selesai", callback_data="aksi_selesai")],
+        [InlineKeyboardButton("🔙 Kembali", callback_data="kembali")]
     ]
 
-    query.message.reply_text(f"""
-📦 DETAIL ORDER
-
-Kode: {kode}
-Nama: {nama}
-Layanan: {layanan}
-Status: {status}
-""", reply_markup=InlineKeyboardMarkup(keyboard))
+    query.message.reply_text(
+        f"📦 Order: {kode}",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 
-def tombol_timbang(update: Update, context: CallbackContext):
+def aksi_admin(update: Update, context: CallbackContext):
 
     query = update.callback_query
     query.answer()
 
-    kode = query.data.split("_")[1]
+    data = query.data
 
-    context.user_data["kode"] = kode
-    context.user_data["berat"] = True
+    if data == "kembali":
+        list_order(query, context)
+        return
 
-    query.message.reply_text(f"Masukkan berat untuk {kode}")
+    kode = context.user_data.get("kode")
 
+    if not kode:
+        query.message.reply_text("❌ Tidak ada kode")
+        return
 
-def tombol_status(update: Update, context: CallbackContext):
-
-    query = update.callback_query
-    query.answer()
-
-    aksi, kode = query.data.split("_")
+    if data == "aksi_timbang":
+        context.user_data["berat"] = True
+        query.message.reply_text("Masukkan berat (kg)")
+        return
 
     status_map = {
-        "proses": "🧼 Diproses",
-        "antar": "🚀 Diantar",
-        "selesai": "✅ Selesai"
+        "aksi_proses": "🧼 Diproses",
+        "aksi_antar": "🚀 Diantar",
+        "aksi_selesai": "✅ Selesai"
     }
 
-    status = status_map[aksi]
+    status = status_map[data]
 
     cursor.execute("SELECT user_id FROM orders WHERE kode=?", (kode,))
     user_id = cursor.fetchone()[0]
@@ -356,7 +354,7 @@ Kode: {kode}
 Status: {status}
 """)
 
-    query.message.reply_text("✅ Status berhasil diupdate")
+    query.message.reply_text("✅ Berhasil update")
 
 # ==============================
 # CEK STATUS USER
@@ -369,7 +367,6 @@ def cek_status(update: Update, context: CallbackContext):
 
     context.user_data["cek"] = True
     query.message.reply_text("Masukkan kode order")
-
 
 # ==============================
 # MAIN
@@ -387,10 +384,8 @@ def main():
     dp.add_handler(CallbackQueryHandler(pilih_layanan, pattern="express|reguler|setrika"))
     dp.add_handler(CallbackQueryHandler(cek_status, pattern="cek"))
 
-    dp.add_handler(CallbackQueryHandler(lihat_order, pattern="lihat"))
-    dp.add_handler(CallbackQueryHandler(detail_order, pattern="detail_"))
-    dp.add_handler(CallbackQueryHandler(tombol_timbang, pattern="timbang_"))
-    dp.add_handler(CallbackQueryHandler(tombol_status, pattern="proses_|antar_|selesai_"))
+    dp.add_handler(CallbackQueryHandler(pilih_order, pattern="pilih_"))
+    dp.add_handler(CallbackQueryHandler(aksi_admin, pattern="aksi_|kembali"))
 
     dp.add_handler(MessageHandler(Filters.location, alamat_maps))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_text))
