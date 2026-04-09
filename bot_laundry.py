@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from multiprocessing import context
 
 from bot_Laundry import generate_kode
