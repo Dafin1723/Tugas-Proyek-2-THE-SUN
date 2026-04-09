@@ -1,4 +1,9 @@
- context.bot.send_message(ADMIN_ID, f"""
+ from multiprocessing import context
+
+from bot_Laundry import generate_kode
+
+
+context.bot.send_message(ADMIN_ID, f"""
 🔔 ORDER BARU
 
 Kode: {kode}
@@ -68,3 +73,67 @@ Total: Rp{int(harga)}
         update.message.reply_text("✅ Berhasil ditimbang", reply_markup=admin_keyboard())
         context.user_data.clear()
         return
+
+    if "layanan" in context.user_data:
+
+        kode = generate_kode()
+
+        cursor.execute("""
+        INSERT INTO orders(kode,user_id,nama,layanan,alamat,status,tanggal)
+        VALUES(?,?,?,?,?,?,?)
+        """, (
+            kode, user.id, user.first_name,
+            context.user_data["layanan"],
+            text, "🚚 Menunggu dijemput",
+            datetime.now().strftime("%d-%m-%Y")
+        ))
+
+        conn.commit()
+
+        update.message.reply_text(f"✅ Order berhasil\nKode: {kode}")
+        context.user_data.clear()
+
+# ==============================
+# ADMIN PRO SYSTEM
+# ==============================
+
+def list_order(update: Update, context: CallbackContext):
+
+    cursor.execute("SELECT kode,nama,status FROM orders ORDER BY id DESC LIMIT 10")
+    data = cursor.fetchall()
+
+    if not data:
+        update.message.reply_text("Belum ada order")
+        return
+
+    keyboard = [
+        [InlineKeyboardButton(f"{d[0]} - {d[1]} ({d[2]})", callback_data=f"pilih_{d[0]}")]
+        for d in data
+    ]
+
+    update.message.reply_text(
+        "📊 Pilih Order:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+def pilih_order(update: Update, context: CallbackContext):
+
+    query = update.callback_query
+    query.answer()
+
+    kode = query.data.split("_")[1]
+    context.user_data["kode"] = kode
+
+    keyboard = [
+        [InlineKeyboardButton("⚖️ Timbang", callback_data="aksi_timbang")],
+        [InlineKeyboardButton("🧼 Proses", callback_data="aksi_proses")],
+        [InlineKeyboardButton("🚀 Antar", callback_data="aksi_antar")],
+        [InlineKeyboardButton("✅ Selesai", callback_data="aksi_selesai")],
+        [InlineKeyboardButton("🔙 Kembali", callback_data="kembali")]
+    ]
+
+    query.message.reply_text(
+        f"📦 Order: {kode}",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
