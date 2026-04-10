@@ -1,24 +1,3 @@
-from multiprocessing import context
-
-from bot_Laundry import generate_kode
-
-
-context.bot.send_message(ADMIN_ID, f"""
-🔔 ORDER BARU
-
-Kode: {kode}
-Nama: {user.first_name}
-Layanan: {layanan}
-
-📍 {link_maps}
-""")
-
-    context.user_data.clear()
-
-# ==============================
-# ORDER MANUAL (TEXT)
-# ==============================
-
 def handle_text(update: Update, context: CallbackContext):
 
     text = update.message.text
