@@ -53,14 +53,44 @@ Bot ini mampu menjawab pertanyaan umum secara otomatis tanpa perlu admin membala
 
 ## ⚙️ Instalasi & Menjalankan Project
 
-### 1. Clone Repository dari GitHub
-```bash
+⚙️ Instalasi & Menjalankan Project
+1. Clone Repository dari GitHub
 git clone https://github.com/Dafin1723/Tugas-Proyek-2-THE-SUN.git
 cd Tugas-Proyek-2-THE-SUN
+2. Buat Virtual Environment (Disarankan)
+python -m venv venv
+venv\Scripts\activate
 
+Jika berhasil, akan muncul (venv) di terminal.
+
+3. Install Semua Kebutuhan (Dependencies)
+
+Jika ada file requirements.txt:
+
+pip install -r requirements.txt
+
+Jika belum ada:
+
+pip install python-telegram-bot python-dotenv
+4. Setup Token Bot Telegram
+Buka Telegram
+Cari BotFather
+
+Ketik:
+
+/start
+
+Buat bot baru:
+
+/newbot
+Ikuti instruksi sampai mendapatkan TOKEN
+5. Buat File Konfigurasi .env
+TOKEN=ISI_TOKEN_BOT_KAMU
+6. Jalankan Bot
+python bot_laundry.py
 
 <p align="center">
   🌞 <b>THE SUN</b> — Project 2  
   <br>
   © 2026 All Rights Reserved
-</p>
+</p
