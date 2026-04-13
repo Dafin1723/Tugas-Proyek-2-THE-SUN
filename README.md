@@ -31,7 +31,32 @@ Tim yang berkomitmen untuk menghadirkan inovasi digital dalam membantu UMKM meni
 Bot ini mampu menjawab pertanyaan umum secara otomatis tanpa perlu admin membalas satu per satu.**
 
 ---
+## 🚀 Fitur Utama
 
+- 💬 Auto-reply pelanggan (chatbot Telegram)
+- 📦 Pilihan layanan laundry (Reguler, Express, Setrika)
+- 💰 Informasi harga otomatis
+- 📍 Input alamat manual & kirim lokasi (maps)
+- 📊 Status pesanan pelanggan
+- 🔐 Menu admin sederhana
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+- Python 3
+- python-telegram-bot
+- SQLite (database)
+- python-dotenv
+
+---
+
+## ⚙️ Instalasi & Menjalankan Project
+
+### 1. Clone Repository dari GitHub
+```bash
+git clone https://github.com/Dafin1723/Tugas-Proyek-2-THE-SUN.git
+cd Tugas-Proyek-2-THE-SUN
 
 
 <p align="center">
