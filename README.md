@@ -31,6 +31,13 @@ Tim yang berkomitmen untuk menghadirkan inovasi digital dalam membantu UMKM meni
 Bot ini mampu menjawab pertanyaan umum secara otomatis tanpa perlu admin membalas satu per satu.**
 
 ---
+⚙️ Instalasi & Menjalankan Project
+1. Clone Repository dari GitHub
+git clone https://github.com/Dafin1723/Tugas-Proyek-2-THE-SUN.git
+cd Tugas-Proyek-2-THE-SUN
+2. Buat Virtual Environment (Disarankan)
+python -m venv venv
+venv\Scripts\activate
 
 
 
