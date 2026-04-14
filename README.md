@@ -45,6 +45,13 @@ Bot ini hadir untuk:
 ![Screenshot Bot](img/tampilanbot.png)
 
 ---
+⚙️ Instalasi & Menjalankan Project
+1. Clone Repository dari GitHub
+git clone https://github.com/Dafin1723/Tugas-Proyek-2-THE-SUN.git
+cd Tugas-Proyek-2-THE-SUN
+2. Buat Virtual Environment (Disarankan)
+python -m venv venv
+venv\Scripts\activate
 
 ## 🚀 Fitur Utama
 
