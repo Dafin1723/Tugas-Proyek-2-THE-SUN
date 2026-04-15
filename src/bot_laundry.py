@@ -24,7 +24,7 @@ from telegram.ext import (
 # CONFIG
 # ==============================
 
-TOKEN = "8729351085:AAEa2yXbwnCGccagbAZqSpV7LkIc12KJ_7E"
+TOKEN = "ISI_PAKE_TOKEN_BOT"
 ADMIN_ID = 8028474070
 
 logging.basicConfig(level=logging.INFO)
